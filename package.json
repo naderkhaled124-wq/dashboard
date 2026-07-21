@@ -1,0 +1,21 @@
+{
+  "name": "interactive-dashboard",
+  "version": "1.0.0",
+  "description": "Interactive data dashboard with file upload, KPIs, charts, and standalone export",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "better-sqlite3": "^12.11.1",
+    "express": "^4.22.2",
+    "multer": "^2.2.0",
+    "papaparse": "^5.5.4",
+    "xlsx": "^0.18.5"
+  }
+}
