@@ -8,6 +8,7 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public'), {
+  index: 'dashboard.html',
   setHeaders: function(res, filePath) {
     if (filePath.endsWith('.js') || filePath.endsWith('.mjs')) {
       res.setHeader('Content-Type', 'application/javascript');
@@ -18,7 +19,7 @@ app.use(express.static(path.join(__dirname, 'public'), {
 app.use('/api', apiRoutes);
 
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
 });
 
 app.use((err, req, res, _next) => {
