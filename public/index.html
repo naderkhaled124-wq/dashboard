@@ -422,6 +422,12 @@ setTimeout(function(){
   if(restoreDashboardState()){
     renderResultTabs();
     goStepDirect(4);
+    if(window._PRELOADED_DATA){
+      var title=window._PRELOADED_DATA.dashboardTitle;
+      if(title){document.querySelector('.header h1').textContent='لوحة التحليل — '+title}
+      var btnsDiv=document.querySelector('#step4 .btns');if(btnsDiv)btnsDiv.style.display='none';
+      var stepsBar=document.getElementById('stepsBar');if(stepsBar)stepsBar.style.display='none';
+    }
   }
 },100);
 
@@ -1756,7 +1762,11 @@ function calcSchemaSimilarity(cols1,cols2){
 
 function saveForGitHub(){
   try{
-    var state={results:RESULTS,config:CONFIG,dashboards:DASHBOARDS,cleanOptions:CLEAN_OPTIONS,colMap:COL_MAP};
+    var name=prompt('اكتب اسم التحليل (مثلاً: تقرير يوليو 2026):','');
+    if(name===null)return;
+    if(!name.trim())name='dashboard';
+    var safeName=name.trim().replace(/[\\/:*?"<>|]/g,'-').replace(/\s+/g,'-');
+    var state={results:RESULTS,config:CONFIG,dashboards:DASHBOARDS,cleanOptions:CLEAN_OPTIONS,colMap:COL_MAP,dashboardTitle:name.trim()};
     var tag=document.createElement('script');
     tag.id='_preloaded';
     tag.textContent='window._PRELOADED_DATA='+JSON.stringify(state)+';';
@@ -1766,10 +1776,10 @@ function saveForGitHub(){
     var blob=new Blob([html],{type:'text/html;charset=utf-8'});
     var url=URL.createObjectURL(blob);
     var a=document.createElement('a');
-    a.href=url;a.download='index.html';
+    a.href=url;a.download=safeName+'.html';
     document.body.appendChild(a);a.click();document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    alert('تم تحميل الملف! استبدل public/index.html به ثم نفّذ:\n\ngit add .\ngit commit -m "تحديث التحليل"\ngit push');
+    alert('تم تحميل الملف: '+safeName+'.html\n\nالآن:\n1. استبدل public/index.html بالملف الجديد (غيّر اسمه لـ index.html)\n2. نفّذ:\n   git add .\n   git commit -m "تحديث"\n   git push');
   }catch(e){alert('خطأ: '+e.message)}
 }
 
