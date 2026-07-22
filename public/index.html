@@ -404,8 +404,10 @@ function persistDashboardState(){
 }
 function restoreDashboardState(){
   try{
-    var raw=window._PRELOADED_DATA?null:localStorage.getItem('dashboard_state');
-    var s=window._PRELOADED_DATA||null;
+    var isLocal=location.hostname==='localhost'||location.hostname==='127.0.0.1';
+    var preload=(isLocal)?null:window._PRELOADED_DATA;
+    var raw=preload?null:localStorage.getItem('dashboard_state');
+    var s=preload||null;
     if(!s&&raw)s=JSON.parse(raw);
     if(!s||!s.results||!s.results.analyses||!Object.keys(s.results.analyses).length)return false;
     COL_MAP=s.colMap||{};
@@ -414,7 +416,7 @@ function restoreDashboardState(){
     CLEAN_OPTIONS=s.cleanOptions||CLEAN_OPTIONS;
     DASHBOARDS=s.dashboards||[];
     currentDashIdx=DASHBOARDS.length>0?0:-1;
-    console.log('Dashboard state restored from '+(window._PRELOADED_DATA?'preloaded data':'localStorage'));
+    console.log('Dashboard state restored from '+(preload?'preloaded data':'localStorage'));
     return true;
   }catch(e){console.warn('Could not restore dashboard state:',e.message);return false}
 }
@@ -422,7 +424,8 @@ setTimeout(function(){
   if(restoreDashboardState()){
     renderResultTabs();
     goStepDirect(4);
-    if(window._PRELOADED_DATA){
+    var isLocal=location.hostname==='localhost'||location.hostname==='127.0.0.1';
+    if(!isLocal&&window._PRELOADED_DATA){
       var title=window._PRELOADED_DATA.dashboardTitle;
       if(title){document.querySelector('.header h1').textContent='لوحة التحليل — '+title}
       var btnsDiv=document.querySelector('#step4 .btns');if(btnsDiv)btnsDiv.style.display='none';
