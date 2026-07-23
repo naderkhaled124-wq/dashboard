@@ -59,7 +59,8 @@ dashboard/
 │   └── workflows/
 │       └── deploy.yml              # GitHub Actions → GitHub Pages
 ├── public/
-│   └── index.html                  # Self-contained SPA (~1760 lines)
+│   ├── index.html                  # Redirect → dashboard.html (fixes GitHub Pages 404)
+│   └── dashboard.html              # Self-contained SPA (~1760 lines)
 │                                   # All HTML + CSS + JS embedded
 │                                   # Cairo font, RTL Arabic
 │                                   # 5 themes: dark/light/blue/green/purple
@@ -68,6 +69,7 @@ dashboard/
 │                                   # Sales scoring system
 │                                   # Multi-dashboard tabs + comparison
 │                                   # localStorage persistence (restores last session)
+│                                   # VIEW_MODE: edit (localhost) / view-only (GitHub Pages)
 ├── server.js                       # Express (LOCAL development only)
 ├── package.json                    # Dependencies (LOCAL only)
 ├── start-dashboard.bat             # Local launcher (LOCAL only)
@@ -117,11 +119,18 @@ dashboard/
 ## [DEPLOYMENT]
 ```
 النشر عبر GitHub Pages:
-  1. git add public/index.html
+  1. git add public/dashboard.html public/index.html
   2. git commit -m "تحديث الداشبورد"
   3. git push
   → GitHub Actions يُلقّم public/ ويُنشره تلقائياً
   → الرابط يتحدث خلال 1-3 دقائق
+  
+ملاحظات:
+  - index.html = redirect فقط (يمنع 404 عند فتح /dashboard/)
+  - dashboard.html = الملف الرئيسي للداشبورد
+  - VIEW_MODE: يُكتشف تلقائياً (localhost=edit, GitHub Pages=view-only)
+  - شجرة subtree split تُعطل ترميز UTF-8 — يجب استخدام Node.js للتعديل
+  - بعد كل subtree split: يجب restore public/ من git
 ```
 
 ## [TESTING_LOG]
@@ -141,6 +150,8 @@ dashboard/
 | HTML: NO export functions | PASS |
 | HTML: NO file:/// references | PASS |
 | HTML: NO localhost references | PASS |
+| GitHub Pages 404 root URL | PASS → redirect to dashboard.html |
+| UTF-8 encoding on gh-pages | PASS → correct Arabic title bytes |
 | Regression: All core functions intact | PASS |
 
 ## [ORPHANS]
