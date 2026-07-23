@@ -14,34 +14,19 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Generate viewer from dashboard
-        run: |
-          node build-viewer.js --from-html public/dashboard.html || true
-      - name: Push to gh-pages
+      - name: Deploy dashboard.html to gh-pages
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           
-          # Save files we need before cleaning the repo
-          mkdir -p /tmp/deploy
-          if [ -f public-viewer/index.html ]; then
-            cp public-viewer/index.html /tmp/deploy/index.html
-          else
-            cp public/index.html /tmp/deploy/index.html
-          fi
-          cp public/dashboard.html /tmp/deploy/dashboard.html
-          
-          # Build gh-pages content in an orphan branch
           TEMP_BRANCH="gh-pages-build-$(date +%s)"
           git checkout --orphan "$TEMP_BRANCH"
           git rm -rf .
           
-          # Restore saved files
-          cp /tmp/deploy/index.html index.html
-          cp /tmp/deploy/dashboard.html dashboard.html
+          cp public/dashboard.html index.html
           
           git add -A
-          git commit -m "deploy: update viewer and dashboard"
+          git commit -m "deploy: update dashboard"
           git branch -f gh-pages "$TEMP_BRANCH"
           git checkout main
           git branch -D "$TEMP_BRANCH"
