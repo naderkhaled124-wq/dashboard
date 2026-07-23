@@ -14,9 +14,27 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Generate viewer from dashboard
+        run: |
+          node build-viewer.js --template || true
+          node build-viewer.js --from-html public/dashboard.html
       - name: Push to gh-pages
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git subtree split --prefix=public -b gh-pages
+          
+          TEMP_BRANCH="gh-pages-build-$(date +%s)"
+          git checkout --orphan "$TEMP_BRANCH"
+          git rm -rf . 2>/dev/null || true
+          
+          # Root = viewer (read-only for management)
+          cp public-viewer/index.html index.html
+          # Dashboard editor accessible at /dashboard/dashboard.html
+          cp public/dashboard.html dashboard.html
+          
+          git add -A
+          git commit -m "deploy: update viewer and dashboard"
+          git branch -f gh-pages "$TEMP_BRANCH"
+          git checkout main
+          git branch -D "$TEMP_BRANCH"
           git push -f origin gh-pages
