@@ -23,33 +23,23 @@
 
 ## [SYSTEM_FLOW]
 ```
-[المستخدم] ─── فتح الرابط (GitHub Pages) ───► [index.html]
+[المستخدم (محلي)] ─── فتح dashboard.html ───► [محرر كامل]
+    │   ├── رفع ملف → تنظيف → إعداد → تحليل → نتائج
+    │   ├── حفظ على الرابط → creates _PRELOADED_DATA
+    │   └── git push → GitHub Actions يُنشئ Viewer
     │
-    ├── [5-Step Wizard Flow]
-    │   ├── الخطوة 1: رفع ملف ──► [FileReader API] ──► [SheetJS/Mammoth/pdf.js]
-    │   │       ├── Excel (.xlsx, .xls) → SheetJS
-    │   │       ├── CSV → SheetJS
-    │   │       ├── JSON → native JSON.parse
-    │   │       ├── SQL → custom parser
-    │   │       ├── Word (.docx) → Mammoth
-    │   │       └── PDF → pdf.js
-    │   │
-    │   ├── الخطوة 2: تنظيف البيانات ──► [dedup, outliers, empty rows, drop columns]
-    │   │       └── Multi-sheet merge support
-    │   │
-    │   ├── الخطوة 3: إعداد التحليل ──► [column picker + sales config]
-    │   │       └── Auto-detect sales columns, weights, targets
-    │   │
-    │   ├── الخطوة 4: النتائج ──► [Plotly charts + sales scoring + executive summary]
-    │   │       ├── ترتيب الفروع (branch ranking)
-    │   │       ├── ترتيب الموظفين (employee ranking)
-    │   │       ├── ملخص البيانات (data summary)
-    │   │       ├── الملخص التنفيذي (executive summary)
-    │   │       └── رسوم بيانية (auto-analysis charts)
-    │   │
-    │   └── الخطوة 5: مقارنة الداشبوردات ──► [schema similarity + KPI delta]
-    │
-    └── [Multi-Dashboard Tabs] ──► [compare two datasets side-by-side]
+    └── [5-Step Wizard Flow] (محرر فقط)
+        ├── الخطوة 1: رفع ملف ──► [FileReader API] ──► [SheetJS/Mammoth/pdf.js]
+        ├── الخطوة 2: تنظيف البيانات ──► [dedup, outliers, empty rows, drop columns]
+        ├── الخطوة 3: إعداد التحليل ──► [column picker + sales config]
+        ├── الخطوة 4: النتائج ──► [Plotly charts + sales scoring + executive summary]
+        └── الخطوة 5: مقارنة الداشبوردات ──► [schema similarity + KPI delta]
+
+[المدير (在线)] ─── فتح الرابط (GitHub Pages) ───► [index.html] (Viewer للقراءة فقط)
+    │   ├── عرض النتائج المحفوظة
+    │   ├── فلترة وترتيب النتائج
+    │   ├── تبديل الثيمات
+    │   └── لا يوجد رفع/تعديل/تحليل
 ```
 
 ## [ARCHITECTURE]
@@ -57,32 +47,29 @@
 dashboard/
 ├── .github/
 │   └── workflows/
-│       └── deploy.yml              # GitHub Actions → GitHub Pages
+│       └── deploy.yml              # GitHub Actions → generates viewer → GitHub Pages
 ├── public/
 │   ├── index.html                  # Redirect → dashboard.html (fixes GitHub Pages 404)
-│   └── dashboard.html              # Self-contained SPA (~1760 lines)
-│                                   # All HTML + CSS + JS embedded
-│                                   # Cairo font, RTL Arabic
-│                                   # 5 themes: dark/light/blue/green/purple
-│                                   # 5-step wizard: upload→clean→config→results→compare
-│                                   # Plotly.js charts, SheetJS parsing
-│                                   # Sales scoring system
-│                                   # Multi-dashboard tabs + comparison
-│                                   # localStorage persistence (restores last session)
-│                                   # VIEW_MODE: edit (localhost) / view-only (GitHub Pages)
+│   ├── dashboard.html              # EDITOR — Self-contained SPA (~1760 lines)
+│   │                               # All HTML + CSS + JS embedded
+│   │                               # Upload, clean, config, analyze, save
+│   │                               # No VIEW_MODE — always full editor
+│   │                               # localStorage persistence
+│   └── viewer-template.html        # VIEWER TEMPLATE — read-only viewer (~59 KB)
+│                                   # Same CSS, only display/render functions
+│                                   # No upload/clean/config/analyze functions
+│                                   # {{DATA_PLACEHOLDER}} for build injection
+├── public-viewer/
+│   └── index.html                  # GENERATED — viewer with preloaded data (~1.8 MB)
+├── build-viewer.js                 # Node.js build script (generates viewer)
+│                                   # node build-viewer.js --template (creates template)
+│                                   # node build-viewer.js --from-html <file> (generates)
+│                                   # node build-viewer.js <state.json> (from JSON)
 ├── server.js                       # Express (LOCAL development only)
-├── package.json                    # Dependencies (LOCAL only)
 ├── start-dashboard.bat             # Local launcher (LOCAL only)
-├── تعليمات_التشغيل.txt             # Local instructions
-├── تعليمات_النشر.txt               # Deployment/update instructions
-├── .gitignore                      # Excludes node_modules, data, uploads
-├── PROJECT_MAP.md                  # This file
+├── .gitignore
+├── PROJECT_MAP.md
 └── (Backend files — unused)
-    ├── database/db.js
-    ├── routes/api.js
-    ├── controllers/upload.js, data.js
-    ├── middleware/validate.js
-    └── utils/parser.js, logger.js
 ```
 
 ## [FEATURES]
@@ -103,7 +90,7 @@ dashboard/
 | حفظ الحالة (localStorage) | ✅ | يُعيد فتح آخر نتائج عند التجديد |
 | نشر عبر GitHub Pages | ✅ | رابط ثابت دائم، تحديث بـ git push |
 | حفظ بأسماء مخصصة | ✅ | prompt لاسم التحليل، تحميل بالاسم المدخل |
-| وضع المشاركة (Shared View) | ✅ | إخفاء أزرار التعديل، عرض العنوان في الهيدر |
+| معمارية منفصلة (محرر + عارض) | ✅ | dashboard.html = مرجر كامل، viewer = عرض فقط |
 | ترجمة الواجهة بالكامل للعربية | ✅ | أسماء الشيتات، Outliers→قيم شاذة، Pearson→بيرسون، score→النتيجة، صيغ الملفات |
 
 ## [DEPRECATED]
@@ -118,25 +105,35 @@ dashboard/
 
 ## [DEPLOYMENT]
 ```
+المعمارية الجديدة (محرر + عارض منفصل):
+  dashboard.html = محرر كامل (محلي فقط)
+  viewer-template.html = قالب العارض
+  public-viewer/index.html = العارض المُنشأ (يُنشر على GitHub Pages)
+
 النشر عبر GitHub Pages:
-  1. git add public/dashboard.html public/index.html
-  2. git commit -m "تحديث الداشبورد"
-  3. git push
-  → GitHub Actions يُلقّم public/ ويُنشره تلقائياً
+  1. حفظ البيانات في dashboard.html (saveForGitHub)
+  2. إنشاء العارض: node build-viewer.js --from-html public/dashboard.html
+  3. git add public/dashboard.html public-viewer/
+  4. git commit -m "تحديث"
+  5. git push
+  → GitHub Actions يُنشئ العارض من dashboard.html
   → الرابط يتحدث خلال 1-3 دقائق
-  
+
+  أو يدوياً:
+  node build-viewer.js --from-html public/dashboard.html
+  → public-viewer/index.html جاهز للنشر
+
 ملاحظات:
-  - index.html = redirect فقط (يمنع 404 عند فتح /dashboard/)
-  - dashboard.html = الملف الرئيسي للداشبورد
-  - VIEW_MODE: يُكتشف تلقائياً (localhost=edit, GitHub Pages=view-only)
+  - index.html (الجذر) = العارض للقراءة فقط
+  - dashboard.html = المحرر الكامل
+  - لا يوجد VIEW_MODE — كل ملف وظيفته واضحة
   - شجرة subtree split تُعطل ترميز UTF-8 — يجب استخدام Node.js للتعديل
-  - بعد كل subtree split: يجب restore public/ من git
 ```
 
 ## [TESTING_LOG]
 | الاختبار | النتيجة |
 |---|---|
-| Server serves index.html (local) | PASS → Status 200 |
+| Server serves dashboard.html (local) | PASS → Status 200 |
 | Server MIME type for .mjs | PASS |
 | HTML: NO manifest link | PASS |
 | HTML: NO theme-color meta | PASS |
@@ -150,9 +147,16 @@ dashboard/
 | HTML: NO export functions | PASS |
 | HTML: NO file:/// references | PASS |
 | HTML: NO localhost references | PASS |
-| GitHub Pages 404 root URL | PASS → redirect to dashboard.html |
-| UTF-8 encoding on gh-pages | PASS → correct Arabic title bytes |
-| Regression: All core functions intact | PASS |
+| GitHub Pages 404 root URL | PASS → viewer loads correctly |
+| UTF-8 encoding on gh-pages | PASS → correct Arabic rendering |
+| dashboard.html: NO IS_EDIT_MODE | PASS (0 references) |
+| dashboard.html: NO applyViewMode | PASS (0 references) |
+| dashboard.html: NO Object.freeze | PASS (0 references) |
+| viewer-template.html: NO upload functions | PASS |
+| viewer-template.html: has render functions | PASS |
+| build-viewer.js generates correct output | PASS (1.84 MB) |
+| Regression: All editor functions intact (49/49) | PASS |
+| Regression: All viewer render functions | PASS |
 
 ## [ORPHANS]
 <!-- Backend API routes, controllers, database, and middleware are no longer used
