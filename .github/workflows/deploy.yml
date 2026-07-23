@@ -19,11 +19,13 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           
+          cp public/dashboard.html /tmp/dashboard.html
+          
           TEMP_BRANCH="gh-pages-build-$(date +%s)"
           git checkout --orphan "$TEMP_BRANCH"
           git rm -rf .
           
-          cp public/dashboard.html index.html
+          cp /tmp/dashboard.html index.html
           
           git add -A
           git commit -m "deploy: update dashboard"
