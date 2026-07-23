@@ -468,13 +468,13 @@ function renderSalesExecutiveTab(salesScores){
 function renderResultTabs(){
   var nav=document.getElementById('resultNav');var html='';
   var hasSS=!!RESULTS.salesScores;
-  html+='<button class="active" onclick="showResultTab(\'_salesBranch\',this)">🏆 ترتيب الفروع</button>';
-  html+='<button onclick="showResultTab(\'_salesEmployee\',this)">👤 ترتيب الموظفين</button>';
-  html+='<button onclick="showResultTab(\'_summary\',this)">ملخص البيانات</button>';
-  html+='<button onclick="showResultTab(\'_salesExec\',this)">📋 الملخص التنفيذي</button>';
-  if(DASHBOARDS.length>=2)html+='<button onclick="showResultTab(\'_compare\',this)">مقارنة الداشبوردات</button>';
+  html+='<button class="active" onclick="showResultTab(\\'_salesBranch\\',this)">🏆 ترتيب الفروع</button>';
+  html+='<button onclick="showResultTab(\\'_salesEmployee\\',this)">👤 ترتيب الموظفين</button>';
+  html+='<button onclick="showResultTab(\\'_summary\\',this)">ملخص البيانات</button>';
+  html+='<button onclick="showResultTab(\\'_salesExec\\',this)">📋 الملخص التنفيذي</button>';
+  if(DASHBOARDS.length>=2)html+='<button onclick="showResultTab(\\'_compare\\',this)">مقارنة الداشبوردات</button>';
   var hasAna=RESULTS.analyses&&Object.keys(RESULTS.analyses).length>0;
-  if(hasAna)html+='<button onclick="showResultTab(\'_analyses\',this)">📊 رسوم بيانية</button>';
+  if(hasAna)html+='<button onclick="showResultTab(\\'_analyses\\',this)">📊 رسوم بيانية</button>';
   nav.innerHTML=html;
   activeTab=hasSS?'_salesBranch':'_summary';
   renderCurrentTab();
@@ -521,8 +521,8 @@ function renderSummaryTab(){
   html+='<div class="kpi" style="border-color:var(--hl)"><div class="l">اجمالي المبيعات</div><div class="v">'+fmt(totalAmount)+'</div><div id="sc_totalAmount"></div></div>';
   html+='<div class="kpi"><div class="l">اجمالي القطع المباعة</div><div class="v">'+fmt(totalPieces)+'</div><div id="sc_totalPieces"></div></div>';
   html+='<div class="kpi"><div class="l">اجمالي عدد الفواتير</div><div class="v">'+fmt(totalCount)+'</div></div>';
-  html+='<div class="kpi"><div class="l">متوسط الفاتورة</div><div class="v">'+fmt(avgInvoice)+'</div><div id="sc_avgInvoice"></div><button class="score-btn" onclick="doScoreCalc(\'amount\','+avgInvoice+',\'متوسط الفاتورة\',\'sc_avgInvoice\')">حساب الscore</button></div>';
-  html+='<div class="kpi"><div class="l">متوسط عدد القطع</div><div class="v">'+fmt(avgPieces)+'</div><div id="sc_avgPieces"></div><button class="score-btn" onclick="doScoreCalc(\'pieces\','+avgPieces+',\'متوسط عدد القطع\',\'sc_avgPieces\')">حساب الscore</button></div>';
+  html+='<div class="kpi"><div class="l">متوسط الفاتورة</div><div class="v">'+fmt(avgInvoice)+'</div><div id="sc_avgInvoice"></div><button class="score-btn" onclick="doScoreCalc(\\'amount\\','+avgInvoice+',\\'متوسط الفاتورة\\',\\'sc_avgInvoice\\')">حساب الscore</button></div>';
+  html+='<div class="kpi"><div class="l">متوسط عدد القطع</div><div class="v">'+fmt(avgPieces)+'</div><div id="sc_avgPieces"></div><button class="score-btn" onclick="doScoreCalc(\\'pieces\\','+avgPieces+',\\'متوسط عدد القطع\\',\\'sc_avgPieces\\')">حساب الscore</button></div>';
   html+='</div>';
   c.innerHTML=html;
 }
